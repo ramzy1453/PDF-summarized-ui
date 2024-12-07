@@ -1,21 +1,26 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.ts';
+	import { Button, buttonVariants } from '$lib/components/ui/button/index.ts';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import { Label } from '$lib/components/ui/label/index.ts';
 	import * as Tabs from '$lib/components/ui/tabs/index.ts';
 	import * as Card from '$lib/components/ui/card/index.ts';
+
+	import LoaderDialog from '$components/LoaderDialog/index.svelte';
+
+	import { dialog } from '$lib/store/index.svelte';
+
 	let files: FileList | null | undefined = $state();
-	let output = $state(
-		'Upload a PDF file to summarize it. The summary will be displayed here. You can also ask a question about the PDF.'
-	);
+	let output = $state('The summary will be displayed here.');
 	let question = $state('');
 	let pdf_id = $state('');
-	$inspect(files);
-	$inspect(pdf_id);
+
+	let operation: string | undefined = $state();
 
 	function uploadPDF() {
 		const formData = new FormData();
 		formData.append('pdf', files?.[0] as Blob);
+
+		operation = 'uploading';
 
 		fetch('http://localhost:8080/api/v1/pdf/upload', {
 			method: 'POST',
@@ -26,6 +31,7 @@
 				pdf_id = data.pdf_id;
 				output = 'PDF uploaded successfully';
 				console.log(data);
+				dialog.open = false;
 			})
 			.catch((error) => {
 				console.error(error);
@@ -41,7 +47,8 @@
 	});
 
 	function summarizePDF() {
-		output = 'Summarizing...';
+		operation = 'summarizing';
+		dialog.open = true;
 		console.log(`http://localhost:8080/api/v1/pdf/summarize/${pdf_id}`);
 		fetch(`http://localhost:8080/api/v1/pdf/summarize/${pdf_id}`, {
 			method: 'POST'
@@ -49,6 +56,7 @@
 			.then((response) => response.json())
 			.then((data) => {
 				console.log(data);
+				dialog.open = false;
 				output = data.summary;
 			})
 			.catch((error) => {
@@ -56,7 +64,7 @@
 			});
 	}
 	function askPDF() {
-		output = 'Asking...';
+		operation = 'asking';
 		console.log(`http://localhost:8080/api/v1/pdf/ask/${pdf_id}`);
 		fetch(`http://localhost:8080/api/v1/pdf/ask/${pdf_id}`, {
 			method: 'POST',
@@ -76,57 +84,48 @@
 	}
 </script>
 
-<div class="">
-	<Tabs.Root value="account" class="w-[400px]">
+<div class="flex flex-col">
+	<input accept="application/pdf" bind:files id="pdf" name="pdf" type="file" />
+	<Tabs.Root value="ask-question" class="w-full">
 		<Tabs.List class="grid w-full grid-cols-2">
-			<Tabs.Trigger value="account">Account</Tabs.Trigger>
-			<Tabs.Trigger value="password">Password</Tabs.Trigger>
+			<Tabs.Trigger value="summarize">Summarize</Tabs.Trigger>
+			<Tabs.Trigger value="ask-question">Ask question</Tabs.Trigger>
 		</Tabs.List>
-		<Tabs.Content value="account">
-			<Card.Root>
+		<Tabs.Content value="summarize">
+			<Card.Root class="h-64">
 				<Card.Header>
-					<Card.Title>Account</Card.Title>
+					<Card.Title>Summarize</Card.Title>
 					<Card.Description>
-						Make changes to your account here. Click save when you're done.
+						Summarize a PDF file. The summary will be displayed here.
 					</Card.Description>
 				</Card.Header>
-				<Card.Content class="space-y-2">
-					<div class="space-y-1">
-						<Label for="name">Name</Label>
-						<Input id="name" value="Pedro Duarte" />
-					</div>
-					<div class="space-y-1">
-						<Label for="username">Username</Label>
-						<Input id="username" value="@peduarte" />
-					</div>
+				<Card.Content>
+					<Button onclick={summarizePDF}>Summarize</Button>
 				</Card.Content>
-				<Card.Footer>
-					<Button>Save changes</Button>
-				</Card.Footer>
 			</Card.Root>
 		</Tabs.Content>
-		<Tabs.Content value="password">
-			<Card.Root>
+		<Tabs.Content value="ask-question">
+			<Card.Root class="h-64">
 				<Card.Header>
-					<Card.Title>Password</Card.Title>
-					<Card.Description>
-						Change your password here. After saving, you'll be logged out.
-					</Card.Description>
+					<Card.Title>Ask question</Card.Title>
+					<Card.Description>Ask a question about the PDF file.</Card.Description>
 				</Card.Header>
 				<Card.Content class="space-y-2">
 					<div class="space-y-1">
-						<Label for="current">Current password</Label>
-						<Input id="current" type="password" />
-					</div>
-					<div class="space-y-1">
-						<Label for="new">New password</Label>
-						<Input id="new" type="password" />
+						<Label for="question">Your question</Label>
+						<Input id="question" type="text" />
 					</div>
 				</Card.Content>
 				<Card.Footer>
-					<Button>Save password</Button>
+					<Button onclick={askPDF}>Ask</Button>
 				</Card.Footer>
 			</Card.Root>
 		</Tabs.Content>
 	</Tabs.Root>
+	<div class="border border-red-950">
+		{output}
+	</div>
+	{#if operation}
+		<LoaderDialog {operation} />
+	{/if}
 </div>
