@@ -8,35 +8,39 @@
 	import LoaderDialog from '$components/LoaderDialog/index.svelte';
 
 	import { dialog } from '$lib/store/index.svelte';
+	import { PDFApi } from '$lib/api/index.ts';
 
 	let files: FileList | null | undefined = $state();
 	let question = $state('');
-	let pdfId = $state('');
+	let pdfId: string | undefined = $state();
 
 	let actualTab = $state('summarize');
 	let output = $state('No output yet. Summarize a PDF file or ask a question to get started.');
 
-	function uploadPDF() {
+	$inspect(question);
+
+	async function uploadPDF() {
 		const formData = new FormData();
 		formData.append('pdf', files?.[0] as Blob);
 		dialog.open = true;
-		fetch('http://localhost:8080/api/v1/pdf/upload', {
-			method: 'POST',
-			body: formData
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				pdfId = data.pdf_id;
-				dialog.open = false;
-				dialog.text = 'Uploading...';
-				toast.success('PDF summarized successfully', {
-					duration: 2000,
-					class: 'text-green-500'
-				});
-			})
-			.catch((error) => {
-				console.error(error);
+
+		try {
+			const uploadedPDF = await PDFApi.uploadPDF(formData);
+			console.log(uploadedPDF);
+			pdfId = uploadedPDF.pdf_id;
+			dialog.open = false;
+			dialog.text = 'Uploading...';
+			toast.success('PDF summarized successfully', {
+				duration: 2000,
+				class: 'text-green-500'
 			});
+		} catch (e: any) {
+			dialog.open = false;
+			toast.error(e.message, {
+				duration: 2000,
+				class: 'text-red-500'
+			});
+		}
 	}
 
 	$effect(() => {
@@ -51,40 +55,45 @@
 		}
 	});
 
-	function summarizePDF() {
-		dialog.open = true;
-		dialog.text = 'Generating...';
-		fetch(`http://localhost:8080/api/v1/pdf/summarize/${pdfId}`, {
-			method: 'POST'
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				dialog.open = false;
-
-				output = data.summary;
-			})
-			.catch((error) => {
-				console.error(error);
+	async function summarizePDF() {
+		try {
+			dialog.open = true;
+			dialog.text = 'Generating...';
+			const summary = await PDFApi.summarizePDF(pdfId!);
+			dialog.open = false;
+			output = summary;
+			toast.success('PDF summarized successfully', {
+				duration: 2000,
+				class: 'text-green-500'
 			});
+		} catch (e: any) {
+			toast.error(e.message, {
+				duration: 2000,
+				class: 'text-red-500'
+			});
+		} finally {
+			dialog.open = false;
+		}
 	}
-	function askPDF() {
-		dialog.text = 'Generating...';
+	async function askPDF() {
 		dialog.open = true;
-		fetch(`http://localhost:8080/api/v1/pdf/ask/${pdfId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ question })
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				dialog.open = false;
-				output = data.answer;
-			})
-			.catch((error) => {
-				console.error(error);
+		dialog.text = 'Generating...';
+
+		try {
+			const answer = await PDFApi.askQuestion(pdfId!, question);
+			output = answer;
+			toast.success('PDF summarized successfully', {
+				duration: 2000,
+				class: 'text-green-500'
 			});
+		} catch (e: any) {
+			toast.error(e.message, {
+				duration: 2000,
+				class: 'text-red-500'
+			});
+		} finally {
+			dialog.open = false;
+		}
 	}
 </script>
 
@@ -113,7 +122,7 @@
 			<SummarizeTab {summarizePDF} />
 		</Tabs.Content>
 		<Tabs.Content value="ask-question">
-			<AskTab {askPDF} {question} />
+			<AskTab {askPDF} bind:question />
 		</Tabs.Content>
 	</Tabs.Root>
 

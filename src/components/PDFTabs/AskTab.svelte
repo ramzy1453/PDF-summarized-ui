@@ -4,7 +4,15 @@
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import { Label } from '$lib/components/ui/label/index.ts';
 
-	let { askPDF, question } = $props();
+	let {
+		askPDF,
+		question = $bindable()
+	}: {
+		askPDF: () => void;
+		question: string;
+	} = $props();
+
+	$inspect(question);
 </script>
 
 <Card.Root>
@@ -15,7 +23,7 @@
 	<Card.Content class="space-y-2">
 		<div class="space-y-1">
 			<Label for="question">Your question</Label>
-			<Input id="question" bind:value={question} type="text" />
+			<Input id="question" type="text" bind:value={question} />
 		</div>
 	</Card.Content>
 	<Card.Footer>
