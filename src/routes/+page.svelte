@@ -23,7 +23,6 @@
 	function uploadPDF() {
 		const formData = new FormData();
 		formData.append('pdf', files?.[0] as Blob);
-		console.log(formData);
 		dialog.open = true;
 		fetch('http://localhost:8080/api/v1/pdf/upload', {
 			method: 'POST',
@@ -31,7 +30,6 @@
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
 				pdfId = data.pdf_id;
 				dialog.open = false;
 				dialog.text = 'Uploading...';
@@ -64,13 +62,11 @@
 	function summarizePDF() {
 		dialog.open = true;
 		dialog.text = 'Generating...';
-		console.log(`http://localhost:8080/api/v1/pdf/summarize/${pdfId}`);
 		fetch(`http://localhost:8080/api/v1/pdf/summarize/${pdfId}`, {
 			method: 'POST'
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
 				dialog.open = false;
 
 				output = data.summary;
@@ -82,7 +78,6 @@
 	function askPDF() {
 		dialog.text = 'Generating...';
 		dialog.open = true;
-		console.log(JSON.stringify({ question }));
 		fetch(`http://localhost:8080/api/v1/pdf/ask/${pdfId}`, {
 			method: 'POST',
 			headers: {
@@ -92,7 +87,6 @@
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
 				dialog.open = false;
 				output = data.answer;
 			})
