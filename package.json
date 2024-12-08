@@ -68,5 +68,8 @@
 		"svelte-markdown": "^0.4.1",
 		"svelte-radix": "^2.0.1",
 		"svelte-sonner": "^0.3.28"
+	},
+	"engines": {
+		"node": "18.x"
 	}
 }
