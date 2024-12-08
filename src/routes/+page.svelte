@@ -24,12 +24,12 @@
 		const formData = new FormData();
 		formData.append('pdf', files?.[0] as Blob);
 		dialog.open = true;
+		dialog.text = 'Uploading...';
 
 		try {
 			const uploadedPDF = await PDFApi.uploadPDF(formData);
 			pdfId = uploadedPDF.pdf_id;
 			dialog.open = false;
-			dialog.text = 'Uploading...';
 			conversations = [];
 			toast.success('PDF summarized successfully', {
 				duration: 2000,
