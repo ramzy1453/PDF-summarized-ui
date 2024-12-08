@@ -19,9 +19,6 @@
 	let output = $state('No output yet. Summarize a PDF file or ask a question to get started.');
 
 	let conversations: IConversation[] = $state.raw([]);
-	$inspect(conversations);
-
-	$inspect(question);
 
 	async function uploadPDF() {
 		const formData = new FormData();
@@ -34,6 +31,7 @@
 			pdfId = uploadedPDF.pdf_id;
 			dialog.open = false;
 			dialog.text = 'Uploading...';
+			conversations = [];
 			toast.success('PDF summarized successfully', {
 				duration: 2000,
 				class: 'text-green-500'
@@ -67,6 +65,7 @@
 			dialog.open = false;
 			output = summary;
 			conversations = [...conversations, { response: summary, request: 'Summarize the PDF' }];
+			question = '';
 		} catch (e: any) {
 			toast.error(e.message, {
 				duration: 2000,
@@ -101,7 +100,7 @@
 		<input
 			id="pdf"
 			type="file"
-			class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-blue-50 file:bg-transparent file:text-sm file:font-medium file:text-blue-700 placeholder:text-muted-foreground hover:file:bg-blue-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+			class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-background file:bg-transparent file:text-sm file:font-medium file:text-primary placeholder:text-muted-foreground hover:file:bg-green-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 			bind:files
 			accept="application/pdf"
 		/>

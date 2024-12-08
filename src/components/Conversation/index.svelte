@@ -27,7 +27,7 @@
 	{/if}
 
 	{#each conversations as conversation, i (i)}
-		<div class="self-end rounded-xl border bg-black px-4 py-2 text-white shadow">
+		<div class="self-end rounded-xl border bg-primary px-4 py-2 text-white shadow">
 			{conversation.request}
 		</div>
 		<div class="max-w-2xl rounded-xl border bg-gray-50 px-4 py-2 shadow">

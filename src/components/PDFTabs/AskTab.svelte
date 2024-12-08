@@ -11,8 +11,6 @@
 		askPDF: () => void;
 		question: string;
 	} = $props();
-
-	$inspect(question);
 </script>
 
 <Card.Root>

@@ -1,6 +1,7 @@
+const apiUrl = import.meta.env.VITE_API_URL;
 export class PDFApi {
 	static async uploadPDF(formData: FormData) {
-		const response = await fetch('http://localhost:8080/api/v1/pdf/upload', {
+		const response = await fetch(`${apiUrl}/upload`, {
 			method: 'POST',
 			body: formData
 		});
@@ -13,7 +14,7 @@ export class PDFApi {
 		if (!pdfId) {
 			throw new Error('PDF is required to summarize the PDF.');
 		}
-		const response = await fetch(`http://localhost:8080/api/v1/pdf/summarize`, {
+		const response = await fetch(`${apiUrl}/summarize`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -32,7 +33,7 @@ export class PDFApi {
 		if (!question || question.trim() === '') {
 			throw new Error('Question is required to ask a question.');
 		}
-		const response = await fetch(`http://localhost:8080/api/v1/pdf/ask`, {
+		const response = await fetch(`${apiUrl}/ask`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
