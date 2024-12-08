@@ -5,6 +5,6 @@
 </script>
 
 <Navbar />
-<div class="mx-auto max-w-6xl px-8 py-4">
+<div class="mx-auto flex max-w-6xl flex-col px-8 py-4">
 	{@render children()}
 </div>

@@ -1,14 +1,15 @@
 <script lang="ts">
 	import * as Tabs from '$lib/components/ui/tabs/index.ts';
 	import { Toaster, toast } from 'svelte-sonner';
-	import SvelteMarkdown from 'svelte-markdown';
 	import SummarizeTab from '$components/PDFTabs/SummarizeTab.svelte';
 	import AskTab from '$components/PDFTabs/AskTab.svelte';
+	import Conversation from '$components/Conversation/index.svelte';
 
 	import LoaderDialog from '$components/LoaderDialog/index.svelte';
 
 	import { dialog } from '$lib/store/index.svelte';
 	import { PDFApi } from '$lib/api/index.ts';
+	import type { IConversation } from '$types/index.d.ts';
 
 	let files: FileList | null | undefined = $state();
 	let question = $state('');
@@ -16,6 +17,9 @@
 
 	let actualTab = $state('summarize');
 	let output = $state('No output yet. Summarize a PDF file or ask a question to get started.');
+
+	let conversations: IConversation[] = $state.raw([]);
+	$inspect(conversations);
 
 	$inspect(question);
 
@@ -62,10 +66,7 @@
 			const summary = await PDFApi.summarizePDF(pdfId!);
 			dialog.open = false;
 			output = summary;
-			toast.success('PDF summarized successfully', {
-				duration: 2000,
-				class: 'text-green-500'
-			});
+			conversations = [...conversations, { response: summary, request: 'Summarize the PDF' }];
 		} catch (e: any) {
 			toast.error(e.message, {
 				duration: 2000,
@@ -82,10 +83,7 @@
 		try {
 			const answer = await PDFApi.askQuestion(pdfId!, question);
 			output = answer;
-			toast.success('PDF summarized successfully', {
-				duration: 2000,
-				class: 'text-green-500'
-			});
+			conversations = [...conversations, { request: question, response: answer }];
 		} catch (e: any) {
 			toast.error(e.message, {
 				duration: 2000,
@@ -98,36 +96,36 @@
 </script>
 
 <Toaster />
-<div class="flex flex-col space-y-6">
-	<input
-		id="pdf"
-		type="file"
-		class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-blue-50 file:bg-transparent file:text-sm file:font-medium file:text-blue-700 placeholder:text-muted-foreground hover:file:bg-blue-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-		bind:files
-		accept="application/pdf"
-	/>
+<div class="flex flex-col space-y-4" style="height: calc(100vh - 80px);">
+	<div class="flex-1 space-y-2">
+		<input
+			id="pdf"
+			type="file"
+			class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-blue-50 file:bg-transparent file:text-sm file:font-medium file:text-blue-700 placeholder:text-muted-foreground hover:file:bg-blue-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+			bind:files
+			accept="application/pdf"
+		/>
 
-	<Tabs.Root
-		value={actualTab}
-		onValueChange={(value) => {
-			actualTab = value!;
-		}}
-		class="w-full"
-	>
-		<Tabs.List class="grid w-full grid-cols-2">
-			<Tabs.Trigger value="summarize">Summarize</Tabs.Trigger>
-			<Tabs.Trigger value="ask-question">Ask question</Tabs.Trigger>
-		</Tabs.List>
-		<Tabs.Content value="summarize">
-			<SummarizeTab {summarizePDF} />
-		</Tabs.Content>
-		<Tabs.Content value="ask-question">
-			<AskTab {askPDF} bind:question />
-		</Tabs.Content>
-	</Tabs.Root>
-
-	<div class="borde rounded-lg p-3 shadow">
-		<SvelteMarkdown source={output} />
+		<Tabs.Root
+			value={actualTab}
+			onValueChange={(value) => {
+				actualTab = value!;
+			}}
+			class="w-full"
+		>
+			<Tabs.List class="grid w-full grid-cols-2">
+				<Tabs.Trigger value="summarize">Summarize</Tabs.Trigger>
+				<Tabs.Trigger value="ask-question">Ask question</Tabs.Trigger>
+			</Tabs.List>
+			<Tabs.Content value="summarize">
+				<SummarizeTab {summarizePDF} />
+			</Tabs.Content>
+			<Tabs.Content value="ask-question">
+				<AskTab {askPDF} bind:question />
+			</Tabs.Content>
+		</Tabs.Root>
+		<LoaderDialog />
 	</div>
-	<LoaderDialog />
+
+	<Conversation {output} {conversations} />
 </div>
