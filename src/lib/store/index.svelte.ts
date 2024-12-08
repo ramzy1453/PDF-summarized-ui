@@ -1,7 +1,4 @@
-export const session = $state({
-	pdf_id: null
-});
-
 export const dialog = $state({
-	open: true
+	open: false,
+	text: ''
 });

@@ -1,8 +1,10 @@
 <script lang="ts">
 	import '../app.css';
 	let { children } = $props();
+	import Navbar from '$components/Navbar/index.svelte';
 </script>
 
-<div class="border border-emerald-800">
+<Navbar />
+<div class="mx-auto max-w-6xl px-8 py-4">
 	{@render children()}
 </div>

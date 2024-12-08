@@ -1,8 +1,8 @@
 <script lang="ts">
-	let { text }: { text: string } = $props();
+	import { dialog } from '$lib/store/index.svelte';
 </script>
 
-<div class="loader" style="--text: '{text}'"></div>
+<div class="loader" style="--text: '{dialog.text}'"></div>
 
 <style>
 	.loader {
