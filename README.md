@@ -32,7 +32,7 @@ Ensure you have the following installed:
 
    ```bash
    git clone https://github.com/your-username/svelte-pdf-summarizer.git
-   cd svelte-pdf-summarizer
+   cd PDF-summarizer-ui
    ```
 
 2. Install the dependencies:
