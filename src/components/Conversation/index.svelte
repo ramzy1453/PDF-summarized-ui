@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { IConversation } from '$types/index.js';
-	import SvelteMarkdown from 'svelte-markdown';
+	import Markdown from '@magidoc/plugin-svelte-marked';
 
 	let {
 		output,
@@ -31,7 +31,7 @@
 			{conversation.request}
 		</div>
 		<div class="max-w-2xl rounded-xl border bg-gray-50 px-4 py-2 shadow">
-			<SvelteMarkdown source={conversation.response} />
+			<Markdown source={conversation.response} />
 		</div>
 	{/each}
 </div>

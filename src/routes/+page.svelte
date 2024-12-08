@@ -27,7 +27,6 @@
 
 		try {
 			const uploadedPDF = await PDFApi.uploadPDF(formData);
-			console.log(uploadedPDF);
 			pdfId = uploadedPDF.pdf_id;
 			dialog.open = false;
 			dialog.text = 'Uploading...';
