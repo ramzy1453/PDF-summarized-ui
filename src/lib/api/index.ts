@@ -1,7 +1,6 @@
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL + '/api/v1/pdf';
 export class PDFApi {
 	static async uploadPDF(formData: FormData) {
-		console.log(apiUrl, `${apiUrl}/upload`, import.meta.env);
 		const response = await fetch(`${apiUrl}/upload`, {
 			method: 'POST',
 			body: formData
@@ -46,6 +45,7 @@ export class PDFApi {
 		});
 
 		const data = await response.json();
+
 		return data.answer;
 	}
 }
