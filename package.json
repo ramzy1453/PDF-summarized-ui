@@ -12,6 +12,9 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint ."
 	},
+	"engines": {
+		"node": "18.x"
+	},
 	"files": [
 		"dist",
 		"!dist/**/*.test.*",
