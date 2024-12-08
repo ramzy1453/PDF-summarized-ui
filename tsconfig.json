@@ -13,15 +13,6 @@
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"types": ["node"],
-		"allowImportingTsExtensions": true,
-		"baseUrl": ".",
-		"paths": {
-			"$lib": ["./src/lib"],
-			"$lib/*": ["./src/lib/*"],
-			"$components": ["./src/components"],
-			"$components/*": ["./src/components/*"],
-			"$types": ["./src/types"],
-			"$types/*": ["./src/types/*"]
-		}
+		"allowImportingTsExtensions": true
 	}
 }
