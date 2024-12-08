@@ -1,9 +1,5 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.ts';
-	import { Input } from '$lib/components/ui/input/index.ts';
-	import { Label } from '$lib/components/ui/label/index.ts';
 	import * as Tabs from '$lib/components/ui/tabs/index.ts';
-	import * as Card from '$lib/components/ui/card/index.ts';
 	import { Toaster, toast } from 'svelte-sonner';
 	import SvelteMarkdown from 'svelte-markdown';
 	import SummarizeTab from '$components/PDFTabs/SummarizeTab.svelte';
@@ -49,15 +45,11 @@
 		}
 	});
 
-	// reset output when tab changes
 	$effect(() => {
 		if (actualTab) {
 			output = 'No output yet. Summarize a PDF file or ask a question to get started.';
 		}
 	});
-
-	$inspect(actualTab);
-	$inspect(pdfId);
 
 	function summarizePDF() {
 		dialog.open = true;
